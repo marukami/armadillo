@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.StrictMode;
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -18,7 +20,6 @@ import java.util.Map;
 import java.util.Set;
 
 import at.favre.lib.bytes.Bytes;
-import timber.log.Timber;
 
 /**
  * A simple wrapper implementation using the {@link DefaultEncryptionProtocol} before persisting
@@ -34,6 +35,7 @@ import timber.log.Timber;
  */
 @SuppressWarnings( {"unused", "WeakerAccess", "UnusedReturnValue"})
 public final class SecureSharedPreferences implements ArmadilloSharedPreferences {
+    private static final String TAG = SecureSharedPreferences.class.getSimpleName();
 
     private static final String PREFERENCES_SALT_KEY = "at.favre.lib.securepref.KEY_RANDOM";
     private static final String PASSWORD_VALIDATION_KEY = "at.favre.lib.securepref.PASSWORD_VALIDATION_KEY";
@@ -62,7 +64,7 @@ public final class SecureSharedPreferences implements ArmadilloSharedPreferences
 
     public SecureSharedPreferences(SharedPreferences sharedPreferences, EncryptionProtocol.Factory encryptionProtocolFactory,
                                    RecoveryPolicy recoveryPolicy, @Nullable char[] password, boolean supportVerifyPassword) {
-        Timber.d("create new secure shared preferences");
+        Armadillo.logger.log(Log.DEBUG, TAG, "create new secure shared preferences");
         this.sharedPreferences = sharedPreferences;
         this.factory = encryptionProtocolFactory;
         this.recoveryPolicy = recoveryPolicy;
@@ -92,7 +94,7 @@ public final class SecureSharedPreferences implements ArmadilloSharedPreferences
         String prefSaltBase64 = sharedPreferences.getString(prefSaltContentKey, null);
         byte[] prefSalt;
         if (prefSaltBase64 == null) {
-            Timber.v("create new preferences random salt");
+            Armadillo.logger.log(Log.VERBOSE, TAG, "create new preferences random salt");
             byte[] generatedPrefSalt = Bytes.random(PREFERENCES_SALT_LENGTH_BYTES, secureRandom).array();
             try {
                 prefSalt = Bytes.wrap(generatedPrefSalt).copy().array();

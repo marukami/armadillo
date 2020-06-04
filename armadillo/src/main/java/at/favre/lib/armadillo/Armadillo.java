@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.provider.Settings;
+import android.util.Log;
+
 import androidx.annotation.Nullable;
 
 import java.security.Provider;
@@ -27,6 +29,7 @@ public final class Armadillo {
     public static final int CONTENT_KEY_OUT_BYTE_LENGTH = 20;
     public static final int DEFAULT_PROTOCOL_VERSION = 0;
     public static final int KITKAT_PROTOCOL_VERSION = -19;
+    static Logger logger = new DefaultLogger();
 
     private Armadillo() {
     }
@@ -61,6 +64,19 @@ public final class Armadillo {
      */
     public static Builder create(Context context, String preferenceName) {
         return new Builder(context, preferenceName);
+    }
+
+    /**
+     * Logs by default are sent to {@link Log}. Passing null as a here will turn off logging.
+     *
+     * @param logger A {@link Logger}
+     */
+    public static void setLogger(@Nullable final Logger logger) {
+        if(logger == null) {
+            Armadillo.logger = new NoOpLogger();
+        } else {
+            Armadillo.logger = logger;
+        }
     }
 
     /**
@@ -583,6 +599,36 @@ public final class Armadillo {
                 throw new UnsupportedOperationException("aes gcm is not supported with KitKat, add support " +
                         "manually with Armadillo.Builder.enableKitKatSupport()");
             }
+        }
+    }
+
+    public interface Logger {
+        default void log(int logLevel, String tag, String message) {
+            switch (logLevel) {
+                case Log.DEBUG:
+                    Log.d(tag, message);
+                    break;
+                case Log.ERROR:
+                    Log.e(tag, message);
+                    break;
+                case Log.INFO:
+                    Log.i(tag, message);
+                    break;
+                case Log.VERBOSE:
+                    Log.v(tag, message);
+                    break;
+                case Log.WARN:
+                    Log.w(tag, message);
+                    break;
+            }
+        }
+    }
+
+    private static class DefaultLogger implements Logger {}
+    private static class NoOpLogger implements Logger {
+        @Override
+        public void log(int logLevel, String tag, String message) {
+            // do nothing.
         }
     }
 }
