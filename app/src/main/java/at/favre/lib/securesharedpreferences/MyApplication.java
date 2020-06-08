@@ -1,18 +1,15 @@
 package at.favre.lib.securesharedpreferences;
 
 import android.app.Application;
+import android.util.Log;
 
 import com.facebook.stetho.Stetho;
-
-import timber.log.Timber;
-
-import static timber.log.Timber.DebugTree;
 
 public class MyApplication extends Application {
 
     public void onCreate() {
         super.onCreate();
-        Timber.plant(new DebugTree());
+        Log.d("MyApplication", "onCreate: was called");
         Stetho.initializeWithDefaults(this);
     }
 }

@@ -67,7 +67,10 @@ public final class Armadillo {
     }
 
     /**
-     * Logs by default are sent to {@link Log}. Passing null as a here will turn off logging.
+     * Logs by default are sent to {@link Log}. If you are using a custom logger Like Timber
+     * you can pass a Logger to delegate the calls to timber.
+     *
+     * Passing null will simply turn off all logging.
      *
      * @param logger A {@link Logger}
      */
@@ -80,7 +83,7 @@ public final class Armadillo {
     }
 
     static void log(int logLevel, String tag, String message, Object... args) {
-        Armadillo.logger.log(logLevel, tag, message, args)
+        Armadillo.logger.log(logLevel, tag, message, args);
     }
 
     /**
